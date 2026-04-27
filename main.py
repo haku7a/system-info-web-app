@@ -38,6 +38,8 @@ def frontend():
 
 @app.get("/api/info/")
 def get_info():
+    memory = psutil.virtual_memory()
+
     return {
         "os": {
             "system": platform.system(),
@@ -50,5 +52,11 @@ def get_info():
             "logical_cores": psutil.cpu_count(logical=True),
             "cpu_percent": psutil.cpu_percent(interval=1)
         },
+        "memory": {
+            "total_gb": round(memory.total / 1024 ** 3, 2),
+            "used_gb": round(memory.used / 1024 ** 3, 2),
+            "free_gb": round(memory.available / 1024 ** 3, 2),
+            "percent": memory.percent
+        }
 
             }
