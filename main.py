@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 import platform
+import psutil
 
 app = FastAPI()
 
@@ -42,6 +43,12 @@ def get_info():
             "system": platform.system(),
             "version": platform.version(),
             "platform": platform.platform()
+        },
+        "cpu": {
+            "processor": platform.processor(),
+            "physical_cores": psutil.cpu_count(logical=False),
+            "logical_cores": psutil.cpu_count(logical=True),
+            "cpu_percent": psutil.cpu_percent(interval=1)
         },
 
             }
