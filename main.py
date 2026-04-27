@@ -5,6 +5,24 @@ import psutil
 
 app = FastAPI()
 
+def get_processor_name():
+    processor = platform.processor()
+
+    if processor:
+        return processor
+
+    try:
+        with open("/proc/cpuinfo", "r", encoding="utf-8") as file:
+            for line in file:
+                if line.startswith("model name"):
+                    return line.split(":", 1)[1].strip()
+    except FileNotFoundError:
+        pass
+
+    return "Unknown processor"
+
+
+
 @app.get("/", response_class=HTMLResponse)
 def frontend():
     return """
@@ -65,7 +83,7 @@ def get_info():
             "platform": platform.platform()
         },
         "cpu": {
-            "processor": platform.processor(),
+            "processor": get_processor_name(),
             "physical_cores": psutil.cpu_count(logical=False),
             "logical_cores": psutil.cpu_count(logical=True),
             "cpu_percent": psutil.cpu_percent(interval=1)
