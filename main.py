@@ -40,6 +40,24 @@ def frontend():
 def get_info():
     memory = psutil.virtual_memory()
 
+    disks = []
+
+    for disk in psutil.disk_partitions():
+        try:
+            usage = psutil.disk_usage(disk.mountpoint)
+
+            disks.append({
+                "device": disk.device,
+                "mountpoint": disk.mountpoint,
+                "filesystem": disk.fstype,
+                "total_gb": round(usage.total / 1024 ** 3, 2),
+                "used_gb": round(usage.used / 1024 ** 3, 2),
+                "available_gb": round(usage.free / 1024 ** 3, 2),
+                "percent": usage.percent
+            })
+        except PermissionError:
+            continue
+
     return {
         "os": {
             "system": platform.system(),
@@ -57,6 +75,7 @@ def get_info():
             "used_gb": round(memory.used / 1024 ** 3, 2),
             "free_gb": round(memory.available / 1024 ** 3, 2),
             "percent": memory.percent
-        }
+        },
+        "disks": disks
 
             }
